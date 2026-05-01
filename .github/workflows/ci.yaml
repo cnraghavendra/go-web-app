@@ -2,7 +2,7 @@ name: CI
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  
+
 on:
   push:
     branches:
@@ -28,12 +28,13 @@ jobs:
        uses: actions/setup-go@v5
        with:
          go-version: 1.22
+         cache: false
 
      - name: Build
        run: go build -o go-web-app
 
      - name: Test
-       run: go test ./..
+       run: go test ./...
 
   code-quality:
     runs-on: ubuntu-latest
@@ -71,7 +72,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-web-app:${{github.run_id}}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-web-app:${{ github.run_id }}
 
   update-newtag-in-helm-chart:
     runs-on: ubuntu-latest
@@ -85,7 +86,8 @@ jobs:
 
     - name: update tag in Helm chart
       run: |
-        sed -i "s/tag: .*/tag: \"${{github.run_id}}\"/" helm/go-web-app-chart/values.yaml
+        sed -i "s/tag:.*/tag: \"${{ github.run_id }}\"/" helm/go-web-app-chart/values.yaml
+
 
     - name: Commit and push changes
       run: |
